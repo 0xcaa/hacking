@@ -7,40 +7,42 @@ import sys
 
 
 def subdomain(hostname, path, file):
-    print("hello from subdomain")
+    print("wfuzz", "-c", "-f", file+",raw", "-w", path+"/Discovery/DNS/bitquark-subdomains-top100000.txt", "-u", "http://"+hostname,"-H", "Host: FUZZ."+hostname, "--sc", "200,202,204,301,302,307,403")
+    return  #remove
 
-    dirb_out = subprocess.run(["wfuzz", "-c", "-f", file, "-w", path+"/Discovery/DNS/bitquark-subdomains-top100000.txt", "-u", "http://"+hostname,"-H", "Host: FUZZ."+hostname, "--sc", "200,202,204,301,302,307,403" ], stdout=subprocess.PIPE)
+    dirb_out = subprocess.run(["wfuzz", "-c", "-f", file+",raw", "-w", path+"/Discovery/DNS/bitquark-subdomains-top100000.txt", "-u", "http://"+hostname,"-H", "Host: FUZZ."+hostname, "--sc", "200,202,204,301,302,307,403" ], stdout=subprocess.PIPE)
     out = dirb_out.stdout.decode("utf-8")
 
     # write to file
-    file_object = open(file, 'a')
-    file_object.write(out)
-    file_object.close()
+#    file_object = open(file, 'a')
+#    file_object.write(out)
+#    file_object.close()
     print("subdomain done!")
 
 def dirbuster(hostname, path, file):
+    print("wfuzz", "-f", file+",raw", "-w", "/Discovery/Web-Content/raft-large-directories.txt", "http://"+hostname+"/FUZZ/")
+    return  #remove
 
-    print("hello from dirbuster")
-
-    dirb_out = subprocess.run(["wfuzz", "-w", path+"/Discovery/Web-Content/raft-large-directories.txt", "http://"+hostname+"/FUZZ/"], stdout=subprocess.PIPE)
+    dirb_out = subprocess.run(["wfuzz", "-f", file+",raw", "-w", "/Discovery/Web-Content/raft-large-directories.txt", "http://"+hostname+"/FUZZ/"], stdout=subprocess.PIPE)
     out = dirb_out.stdout.decode("utf-8")
 
     # write to file
-    file_object = open(file, 'a')
-    file_object.write(out)
-    file_object.close()
+#    file_object = open(file, 'a')
+#    file_object.write(out)
+#    file_object.close()
     print("dirbuster done!")
 
-def nmap(ip, file):
-    print("hello from nmap")
+def nmap(ip, flags, file):
+    print("nmap -oN", file, flags, "ip")
+    return  #remove
 
-    nmap_out = subprocess.run(["nmap", "ip"], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    nmap_out = subprocess.run(["nmap -oN", file, flags, "ip"], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     out = nmap_out.stdout.decode("utf-8")
 
     # write to file
-    file_object = open(file, 'a')
-    file_object.write(out)
-    file_object.close()
+#    file_object = open(file, 'a')
+#    file_object.write(out)
+#    file_object.close()
     print("nmap done!")
 
 
@@ -61,6 +63,7 @@ def main():
     hostname = sys.argv[2]
     wlist_path = sys.argv[3]
     start_time = perf_counter()
+    flags_nmap = ""
     nmap_file = "nmap_out.txt"
     dirb_file = "dirb_out.txt"
     subd_file = "subd_out.txt"
@@ -71,13 +74,34 @@ def main():
             print("hostname not in /etc/hosts file")
             sys.exit()
 
-    t1 = Thread(target=nmap, args=(ip, nmap_file))
-    t2 = Thread(target=dirbuster, args=(ip, wlist_path, dirb_file))
-    t3 = Thread(target=subdomain, args=(hostname, wlist_path, subd_file))
 
-    t1.start()
-    t2.start()
-    t3.start()
+
+    if (q := input("run nmap?(y/n): ")) == "y":
+        flags_nmap =  str(input("flags(blank for none): "))
+        print("nmap started")
+        t1 = Thread(target=nmap, args=(ip, flags_nmap, nmap_file))
+        t1.daemon=True
+        t1.start()
+    elif q == "n":
+        pass
+    else:
+        sys.exit()
+    if (q := input("run dirb?(y/n): ")) == "y":
+        print("dirb started")
+        t2 = Thread(target=dirbuster, args=(ip, wlist_path, dirb_file))
+        t2.start()
+    elif q == "n":
+        pass
+    else:
+        sys.exit()
+    if (q := input("run subdomain brute?(y/n): ")) == "y":
+        print("subdomain started")
+        t3 = Thread(target=subdomain, args=(hostname, wlist_path, subd_file))
+        t3.start()
+    elif q == "n":
+        pass
+    else:
+        sys.exit()
 
     t1.join()
     t2.join()
