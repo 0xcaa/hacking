@@ -8,7 +8,7 @@ import sys
 
 def subdomain(hostname, path, file):
     print("wfuzz", "-c", "-f", file+",raw", "-w", path+"/Discovery/DNS/bitquark-subdomains-top100000.txt", "-u", "http://"+hostname,"-H", "Host: FUZZ."+hostname, "--sc", "200,202,204,301,302,307,403")
-    return  #remove
+#    return  #remove
 
     dirb_out = subprocess.run(["wfuzz", "-c", "-f", file+",raw", "-w", path+"/Discovery/DNS/bitquark-subdomains-top100000.txt", "-u", "http://"+hostname,"-H", "Host: FUZZ."+hostname, "--sc", "200,202,204,301,302,307,403" ], stdout=subprocess.PIPE)
     out = dirb_out.stdout.decode("utf-8")
@@ -21,7 +21,7 @@ def subdomain(hostname, path, file):
 
 def dirbuster(hostname, path, file):
     print("wfuzz", "-f", file+",raw", "-w", "/Discovery/Web-Content/raft-large-directories.txt", "http://"+hostname+"/FUZZ/")
-    return  #remove
+#    return  #remove
 
     dirb_out = subprocess.run(["wfuzz", "-f", file+",raw", "-w", "/Discovery/Web-Content/raft-large-directories.txt", "http://"+hostname+"/FUZZ/"], stdout=subprocess.PIPE)
     out = dirb_out.stdout.decode("utf-8")
@@ -34,7 +34,7 @@ def dirbuster(hostname, path, file):
 
 def nmap(ip, flags, file):
     print("nmap -oN", file, flags, "ip")
-    return  #remove
+#    return  #remove
 
     nmap_out = subprocess.run(["nmap -oN", file, flags, "ip"], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     out = nmap_out.stdout.decode("utf-8")
