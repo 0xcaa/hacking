@@ -1,0 +1,6 @@
+
+# nmap
+nmap -p - -T4 -sC sV {IP}
+
+
+

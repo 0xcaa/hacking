@@ -92,11 +92,11 @@ def main():
     dirb_file = "/home/sophist/dirb_out.txt"
     subd_file = "/home/sophist/subd_out.txt"
 
-    with open('/etc/hosts') as f:
-        if hostname not in f.read():
-            f.close()
-            print("hostname not in /etc/hosts file")
-            sys.exit()
+#    with open('/etc/hosts') as f:
+#        if hostname not in f.read():
+#            f.close()
+#            print("hostname not in /etc/hosts file")
+#            sys.exit()
 
 
 
